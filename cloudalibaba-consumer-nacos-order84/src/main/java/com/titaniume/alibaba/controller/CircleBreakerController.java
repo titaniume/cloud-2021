@@ -2,13 +2,17 @@ package com.titaniume.alibaba.controller;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.titaniume.alibaba.service.PaymentService;
 import com.titaniume.springcloud.entities.CommonResult;
 import com.titaniume.springcloud.entities.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
 
 /**
  * @program: cloud2021
@@ -53,5 +57,19 @@ public class CircleBreakerController {
         Payment payment = new Payment(id,"null");
         return new CommonResult<>(445,"blockHandler-sentinel限流,无此流水: blockException  "+blockException.getMessage(),payment);
     }
+
+    //==================OpenFeign
+    @Resource
+    private PaymentService paymentService;
+
+    @GetMapping(value = "/consumer/openfeign/{id}")
+    public CommonResult<Payment> paymentSQL(@PathVariable("id") Long id) {
+        if(id == 4) {
+            throw new RuntimeException("没有该id");
+        }
+        return paymentService.paymentSQL(id);
+    }
+
+
 
 }
